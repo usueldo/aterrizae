@@ -10,7 +10,10 @@ public class Fecha {
 	String day = "";
 	String month = "";
 	String year = "";
-
+	//Quita caracteres especiales de una fecha (/,-,+,etc...)
+	public String dejarNumeros() {
+		return "";
+	}
 	public void setFechaFormateada(Date fechaFormateada) {
 		this.fechaFormateada = fechaFormateada;
 	}	
@@ -47,7 +50,42 @@ public class Fecha {
 		return fechaFormateada;
 	}
 
-	public void formatear(String fechaSinFormatear) throws ParseException {
+	protected void formatear(String fechaSinFormatear) throws ParseException {
+
+	}
+	
+	public void formatearFecha(String fechaSinFormatear) {
+		/*if(esISO){
+		formatear(yyyy-mm-dd)
+		}
+		elseif(esLatin){
+			formatear(dd/mm/yyyy)
+		}
+		else{
+		 removerSeparadores(yyyy-dd-mm)
+		 formatear(ddmmyyyy)
+		}*/
+		/*
+		int cantidadDeFechas  = tiposDeFecha.size() - 1;
+		for(int indice = 0; indice < cantidadFechas && 
+							tiposFecha[indice].esValido(fechaSinFormatear); indice++){
+			tiposFecha[indice].formatear(fechaSinFormatear);
+		}*/
+
+		//TipoDeFecha seria una interfaz que incluya ISO,Latin,etc..
+		for(TiposFecha tipoFecha: tiposDeFecha) {
+			//No pueden existir dos patrones validos,
+			//es decir, una fecha con dos patrones
+			if(tipoFecha.esValido(fechaSinFormatear)) {
+				tipoFecha.formatear(fechaSinFormatear);
+			}
+		}
+		
+		if(!this.fechaEstaFormateada()) {
+			this.getPattern()//trato de obtener patron, si no lo encuentro lanzo excepcion
+			//Lanzar excepcion
+		}
+
 	}
 	
 	public long calcularDias(Date fecha) {
