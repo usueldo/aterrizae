@@ -1,7 +1,8 @@
 package modelo;
 
-public class ISO8601 extends Fecha2 {
-	void formatear(String fechaSinFormatear) {}
-	void calcularDias(Fecha2 primerFecha, Fecha2 segundaFecha) {}
-	void obtenerAnterior(Fecha2 primerFecha, Fecha2 segundaFecha) {}
+import java.util.Date;
+
+public class ISO8601 extends Fecha implements IFormatoFecha {
+	public void formatear(String fechaSinFormatear) {}
+	public boolean esValido (String fechaSinFormatear) {return false;}
 }

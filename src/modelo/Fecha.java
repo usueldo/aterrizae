@@ -3,13 +3,14 @@ package modelo;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
+import java.util.ArrayList;
 public class Fecha {
-	Date fechaFormateada = new Date();
-	SimpleDateFormat formato = new SimpleDateFormat("dd MM yyyy");
-	String day = "";
+	Date fechaFormateada = null;
+	String day 	 = "";
 	String month = "";
-	String year = "";
+	String year  = "";
+	SimpleDateFormat formato = new SimpleDateFormat("dd MM yyyy");
+
 	//Quita caracteres especiales de una fecha (/,-,+,etc...)
 	public String dejarNumeros() {
 		return "";
@@ -18,30 +19,6 @@ public class Fecha {
 		this.fechaFormateada = fechaFormateada;
 	}	
 	
-	public String getDay() {
-		return day;
-	}
-
-	public String getMonth() {
-		return month;
-	}
-
-	public String getYear() {
-		return year;
-	}
-
-	public void setDay(String day) {
-		this.day = day;
-	}
-
-	public void setMonth(String month) {
-		this.month = month;
-	}
-
-	public void setYear(String year) {
-		this.year = year;
-	}
-
 	public SimpleDateFormat getFormato() {
 		return formato;
 	}
@@ -50,11 +27,8 @@ public class Fecha {
 		return fechaFormateada;
 	}
 
-	protected void formatear(String fechaSinFormatear) throws ParseException {
-
-	}
 	
-	public void formatearFecha(String fechaSinFormatear) {
+	public void formatearCualquierFecha(String fechaSinFormatear) throws ParseException {
 		/*if(esISO){
 		formatear(yyyy-mm-dd)
 		}
@@ -71,9 +45,13 @@ public class Fecha {
 							tiposFecha[indice].esValido(fechaSinFormatear); indice++){
 			tiposFecha[indice].formatear(fechaSinFormatear);
 		}*/
-
+		LatinoAmericano latin = new LatinoAmericano();
+		ISO8601 ISO = new ISO8601();
+		ArrayList<IFormatoFecha> tiposDeFecha = new ArrayList<IFormatoFecha>();
+		tiposDeFecha.add(ISO);
+		tiposDeFecha.add(latin);
 		//TipoDeFecha seria una interfaz que incluya ISO,Latin,etc..
-		for(TiposFecha tipoFecha: tiposDeFecha) {
+		for(IFormatoFecha tipoFecha: tiposDeFecha) {
 			//No pueden existir dos patrones validos,
 			//es decir, una fecha con dos patrones
 			if(tipoFecha.esValido(fechaSinFormatear)) {
@@ -82,10 +60,15 @@ public class Fecha {
 		}
 		
 		if(!this.fechaEstaFormateada()) {
-			this.getPattern()//trato de obtener patron, si no lo encuentro lanzo excepcion
-			//Lanzar excepcion
+			System.out.println("Fecha no esta formateada");
+		}else {
+			System.out.println("Fecha esta formateada !");
 		}
 
+	}
+	
+	public boolean fechaEstaFormateada() {
+		return this.fechaFormateada != null;
 	}
 	
 	public long calcularDias(Date fecha) {
@@ -101,4 +84,7 @@ public class Fecha {
 		//La fecha formateada es anterior a la fecha ingresada
 		return this.getFechaFormateada().compareTo(fecha) < 0;
 	}
+
+	public boolean esValido(String Fecha) { return false;};
+	
 }
