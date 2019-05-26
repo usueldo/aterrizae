@@ -3,23 +3,21 @@ package modelo;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
+
 public class Fecha {
-	Date fechaFormateada = null;
-	String day 	 = "";
-	String month = "";
-	String year  = "";
+	protected Date fechaFormateada;
+	protected String dia	 = "";
+	protected String mes	 = "";
+	protected String anio	 = "";
 	SimpleDateFormat formato = new SimpleDateFormat("dd MM yyyy");
 
-	//Quita caracteres especiales de una fecha (/,-,+,etc...)
-	public String dejarNumeros() {
-		return "";
-	}
-	public void setFechaFormateada(Date fechaFormateada) {
-		this.fechaFormateada = fechaFormateada;
+	protected void setFechaFormateada(Date fechaFormateada) {
+	this.fechaFormateada = fechaFormateada;
 	}	
 	
-	public SimpleDateFormat getFormato() {
+	protected SimpleDateFormat getFormato() {
 		return formato;
 	}
 
@@ -27,44 +25,42 @@ public class Fecha {
 		return fechaFormateada;
 	}
 
-	
-	public void formatearCualquierFecha(String fechaSinFormatear) throws ParseException {
-		/*if(esISO){
-		formatear(yyyy-mm-dd)
+	protected void formatearFecha(String fecha) {
+		Date fechaObtenida;
+		try {
+			fechaObtenida = formato.parse(fecha);
+			this.setFechaFormateada(fechaObtenida);
+		} catch (ParseException exception) {
+			System.out.println(exception);
 		}
-		elseif(esLatin){
-			formatear(dd/mm/yyyy)
-		}
-		else{
-		 removerSeparadores(yyyy-dd-mm)
-		 formatear(ddmmyyyy)
-		}*/
-		/*
-		int cantidadDeFechas  = tiposDeFecha.size() - 1;
-		for(int indice = 0; indice < cantidadFechas && 
-							tiposFecha[indice].esValido(fechaSinFormatear); indice++){
-			tiposFecha[indice].formatear(fechaSinFormatear);
-		}*/
-		LatinoAmericano latin = new LatinoAmericano();
-		ISO8601 ISO = new ISO8601();
+	}
+	public void formatearCualquierFecha(String fechaSinFormatear) throws FechaInvalidaException {
 		ArrayList<IFormatoFecha> tiposDeFecha = new ArrayList<IFormatoFecha>();
-		tiposDeFecha.add(ISO);
-		tiposDeFecha.add(latin);
+		//Se cargan todos los formatos de fechas compatibles
+		tiposDeFecha.add(new ISO8601());
+		tiposDeFecha.add(new NorteAmericano());
+		tiposDeFecha.add(new LatinoAmericano());	
+		
 		//TipoDeFecha seria una interfaz que incluya ISO,Latin,etc..
 		for(IFormatoFecha tipoFecha: tiposDeFecha) {
 			//No pueden existir dos patrones validos,
 			//es decir, una fecha con dos patrones
 			if(tipoFecha.esValido(fechaSinFormatear)) {
-				tipoFecha.formatear(fechaSinFormatear);
+				try {
+					tipoFecha.formatear(fechaSinFormatear);
+				} catch (ParseException exception) {
+					System.out.println(exception);
+				}
+				//Se asigna la  fecha formateada
+				this.setFechaFormateada(tipoFecha.getFecha());
 			}
+		}	
+		//Se comprueba si se formateo la fecha
+		if(!this.fechaEstaFormateada()) 
+		{
+			//Se informa que no se pudo formatear la fecha
+			throw new FechaInvalidaException();
 		}
-		
-		if(!this.fechaEstaFormateada()) {
-			System.out.println("Fecha no esta formateada");
-		}else {
-			System.out.println("Fecha esta formateada !");
-		}
-
 	}
 	
 	public boolean fechaEstaFormateada() {
@@ -72,12 +68,17 @@ public class Fecha {
 	}
 	
 	public long calcularDias(Date fecha) {
+		long diferenciaEnMilesimas;
 		if(this.esAnteriorA(fecha)) {
 			//Fecha formateada es menor a la fecha ingresada
-			return fecha.getTime() - this.getFechaFormateada().getTime();
+			diferenciaEnMilesimas= fecha.getTime() - this.getFechaFormateada().getTime();
 		}
+		
 		//Fecha formateada es mayor a la fecha ingresada
-		return this.getFechaFormateada().getTime() - fecha.getTime();
+		diferenciaEnMilesimas = this.getFechaFormateada().getTime() - fecha.getTime();
+		
+		//Se convierte las milesimas en dias
+		return TimeUnit.DAYS.convert(diferenciaEnMilesimas, TimeUnit.MILLISECONDS);
 	}
 	
 	public boolean esAnteriorA(Date fecha) {
@@ -85,6 +86,6 @@ public class Fecha {
 		return this.getFechaFormateada().compareTo(fecha) < 0;
 	}
 
-	public boolean esValido(String Fecha) { return false;};
+
 	
 }
